@@ -7,7 +7,7 @@
 SELECT
     STUDENT_NO 학번
     , STUDENT_NAME 이름
-    , ENTRANCE_DATE 입학년도
+    , TO_CHAR(ENTRANCE_DATE, 'YYYY') 입학년도
 FROM
     TB_STUDENT
 ORDER BY 
@@ -31,18 +31,13 @@ WHERE
 -- 실행 월에 따라 결과 값 다를 수 있으므로 PROFESSOR_SSN 같이 SELECT 해서 확인해보기!!
 SELECT
     PROFESSOR_NAME 교수이름
-    --, PROFESSOR_SSN 민번
-    --, FLOOR(MONTHS_BETWEEN(SYSDATE, TO_DATE('19'||SUBSTR(PROFESSOR_SSN, 1, 6), 'YYYYMMDD'))/12) 나이
 FROM
     TB_PROFESSOR
 WHERE
     SUBSTR(PROFESSOR_SSN, 8, 1) = 1
 ORDER BY 
-    FLOOR(MONTHS_BETWEEN(SYSDATE, TO_DATE('19'||SUBSTR(PROFESSOR_SSN, 1, 6), 'YYYYMMDD'))/12);
+    SUBSTR(PROFESSOR_SSN, 1, 6), PROFESSOR_NAME;
 
--- SELECT TO_DATE('19'||SUBSTR('490114-1144781', 1, 6), 'YYYYMMDD') FROM DUAL
--- SELECT FLOOR(MONTHS_BETWEEN(SYSDATE, TO_DATE('19'||SUBSTR('490114-1144781', 1, 6), 'YYYYMMDD'))/12) FROM DUAL
--- SELECT TO_DATE(SUBSTR('880724-1032311', 1, 6), 'YYYYMMDD') FROM DUAL
 
 -- 4번
 -- 교수들의 이름 중 성을 제외한 이름만 출력하는 SQL 문장을 작성하시오. 출력 헤더는 "이름"이 찍히도록 한다.
@@ -62,8 +57,7 @@ SELECT
 FROM
     TB_STUDENT
 WHERE 
-    SUBSTR(TO_CHAR(ENTRANCE_DATE, 'YYYYMMDD'), 1, 4) 
-    - SUBSTR(TO_CHAR(TO_DATE('19'||SUBSTR(STUDENT_SSN, 1, 6), 'YYYYMMDD'), 'YYYYMMDD'), 1, 4) <= 20;
+    MONTHS_BETWEEN(ENTRANCE_DATE, TO_DATE('19'||SUBSTR(STUDENT_SSN, 1, 6), 'YYYYMMDD')) / 12 <= 20;
 
 -- SELECT 
 --     SUBSTR(TO_CHAR(ENTRANCE_DATE, 'YYYYMMDD'), 1, 4) || '-' || 
@@ -191,24 +185,13 @@ HAVING COUNT(*) > 1;
 -- 15번
 -- 학번이 A112113인 김고운 학생의 년도, 학기 별 평점과 년도 별 누적 평점, 총 평점을 구하는 SQL문을 작성하시오.
 -- (단, 평점은 소수점 1자리까지만 반올림하여 표시한다.)
--- SELECT
---     SUBSTR(TERM_NO, 1, 4) AS 년도
---     , SUBSTR(TERM_NO, 5, 2) AS 학기
---     , ROUND(AVG(POINT), 1) AS 학기별평점
--- FROM
---     TB_GRADE
--- WHERE
---     STUDENT_NO = 'A112113'
--- GROUP BY 
---     SUBSTR(TERM_NO, 1, 4)
---     , SUBSTR(TERM_NO, 5, 2)
 
 SELECT 
     년도
     , 학기
     , 학기별평점
     , ROUND(AVG(학기별평점) OVER (PARTITION BY 년도), 1) AS 년도별누적평점
-    , ROUND(SUM(학기별평점) OVER (), 1) AS 총평점
+    , ROUND(AVG(학기별평점) OVER (), 1) AS 총평점
 FROM
     (
         SELECT 
