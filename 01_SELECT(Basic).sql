@@ -51,7 +51,7 @@ FROM
     TB_STUDENT 
 WHERE 
     STUDENT_NO IN('A513079', 'A513090', 'A513091', 'A513110', 'A513119')
-ORDER BY STUDENT_NO DESC;
+ORDER BY STUDENT_NAME DESC;
 
 -- 5번
 -- 입학 정원이 20명 이상 30명 이하인 학과들의 학과 이름과 계열을 출력하시오.
