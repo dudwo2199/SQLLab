@@ -18,7 +18,8 @@ ORDER BY
 -- 춘 기술대학교의 교수 중 이름이 세 글자가 아닌 교수가 한 명 있다고 한다. 그 교수의 이름과 주민번호를 화면에 출력하는 SQL문장을 작성해보자.
 -- (*이때 올바르게 작성한 SQL 문장의 결과 값이 예상과 다르게 나올 수 있다. 원인이 무엇인지 생각해볼 것) 
 SELECT
-    PROFESSOR_SSN 주민번호
+    PROFESSOR_NAME
+    , PROFESSOR_SSN 주민번호
 FROM
     TB_PROFESSOR
 WHERE
