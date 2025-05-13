@@ -98,8 +98,8 @@ FROM TB_CLASS C
 -- 8번의 결과 중 '인문 사회' 계열에 속한 과목의 교수 이름을 찾으려고 한다.
 -- 이에 해당하는 과목 이름과 교수 이름을 출력하는 SQL문을 작성하시오.
 SELECT
-    CLASS_NAME
-    , PROFESSOR_NAME
+    CLASS_NAME 과목
+    , PROFESSOR_NAME AS "교수 이름"
 FROM 
     TB_CLASS C
     JOIN TB_PROFESSOR P ON C.DEPARTMENT_NO = P.DEPARTMENT_NO
@@ -162,8 +162,8 @@ WHERE
 -- 그 과목 이름과 학과 이름을 출력하는 SQL 문장을 작성하시오.
 -- 결과 행의 수는 동일하나 정렬 기준이 없어 다른 순서를 보임
 SELECT 
-    C.CLASS_NAME
-    , D.DEPARTMENT_NAME
+    C.CLASS_NAME 과목
+    , D.DEPARTMENT_NAME 학과
 FROM 
     TB_CLASS C
     JOIN TB_DEPARTMENT D ON C.DEPARTMENT_NO = D.DEPARTMENT_NO
@@ -209,7 +209,7 @@ HAVING AVG(G.POINT) >= 4.0;
 -- 16번
 -- 환경조경학과 전공과목들의 과목 별 평점을 파악할 수 있는 SQL 문을 작성하시오.
 SELECT
-    C.CLASS_NAME
+    C.CLASS_NAME 과목
     , TO_CHAR(ROUND(AVG(G.POINT), 1), '9.9') 평점
 FROM 
     TB_DEPARTMENT D
