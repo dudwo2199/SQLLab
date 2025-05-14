@@ -58,13 +58,12 @@ ORDER BY PROFESSOR_SSN;
 SELECT
     STUDENT_NAME 이름
     , TO_CHAR(POINT, 'FM9.00') 학점
-FROM 
-    TB_STUDENT s
-    JOIN TB_GRADE g ON s.STUDENT_NO = g.STUDENT_NO
+FROM
+TB_GRADE
 WHERE  
     g.TERM_NO = 200402
     AND g.CLASS_NO = 'C3118100'
-ORDER BY POINT DESC, s.STUDENT_NO;
+ORDER BY POINT DESC, STUDENT_NO;
 
 -- 6번
 -- 학생 번호, 학생 이름, 학과 이름을 학생 이름으로 오름차순 정렬하여 출력하는 SQL문을 작성하시오.
@@ -84,15 +83,22 @@ SELECT
     , D.DEPARTMENT_NAME 학과
 FROM
     TB_CLASS C
-    JOIN TB_DEPARTMENT D ON C.DEPARTMENT_NO = D.DEPARTMENT_NO;
-
+    JOIN TB_DEPARTMENT D ON C.DEPARTMENT_NO = D.DEPARTMENT_NO
+ORDER BY 2, 1;
 -- 8번
 -- 과목별 교수 이름을 찾으려고 한다. 과목 이름과 교수 이름을 출력하는 SQL문을 작성하시오.
 SELECT
     CLASS_NAME 이름
     , PROFESSOR_NAME AS "교수 이름"
-FROM TB_CLASS C
-    JOIN TB_PROFESSOR P ON C.DEPARTMENT_NO = P.DEPARTMENT_NO;
+FROM 
+    TB_CLASS C
+    , TB_PROFESSOR P 
+    , TB_CLASS_PROFESSOR CP
+WHERE
+    C.CLASS_NO = CP.CLASS_NO
+    AND CP.PROFESSOR_NO = P.PROFESSOR_NO
+ORDER BY 2, 1;
+
 
 -- 9번
 -- 8번의 결과 중 '인문 사회' 계열에 속한 과목의 교수 이름을 찾으려고 한다.
@@ -102,10 +108,15 @@ SELECT
     , PROFESSOR_NAME AS "교수 이름"
 FROM 
     TB_CLASS C
-    JOIN TB_PROFESSOR P ON C.DEPARTMENT_NO = P.DEPARTMENT_NO
-    JOIN TB_DEPARTMENT D ON C.DEPARTMENT_NO = D.DEPARTMENT_NO
+    , TB_PROFESSOR P
+    , TB_CLASS_PROFESSOR CP
+    , TB_DEPARTMENT D
 WHERE
-    D.CATEGORY LIKE '%인문사회%';
+    C.CLASS_NO = CP.CLASS_NO
+    AND CP.PROFESSOR_NO = P.PROFESSOR_NO
+    AND P.DEPARTMENT_NO = D.DEPARTMENT_NO
+    AND D.CATEGORY LIKE '%인문사회%'
+ORDER BY 2, 1;
 
 -- 10번
 -- '음악학과' 학생들의 평점을 구하려고 한다. 
@@ -127,7 +138,8 @@ HAVING S.DEPARTMENT_NO =
         TB_DEPARTMENT
     WHERE
         DEPARTMENT_NAME LIKE '%음악학과%'
-);
+)
+ORDER BY 1;
 
 -- 11번
 -- 학번이 A313047인 학생이 학교에 나오고 있지 않다. 지도 교수에게 내용을 전달하기 위한 
@@ -170,7 +182,8 @@ FROM
     LEFT JOIN TB_CLASS_PROFESSOR CP ON C.CLASS_NO = CP.CLASS_NO
 WHERE 
     D.CATEGORY = '예체능'
-    AND CP.PROFESSOR_NO IS NULL;
+    AND CP.PROFESSOR_NO IS NULL
+ORDER BY 2, 1;
 
 
 -- 14번
@@ -209,16 +222,18 @@ HAVING AVG(G.POINT) >= 4.0;
 -- 16번
 -- 환경조경학과 전공과목들의 과목 별 평점을 파악할 수 있는 SQL 문을 작성하시오.
 SELECT
-    C.CLASS_NAME 과목
-    , TO_CHAR(ROUND(AVG(G.POINT), 1), '9.9') 평점
+    C.CLASS_NO
+    , C.CLASS_NAME 과목
+    , ROUND(AVG(G.POINT), 1) 평점
 FROM 
     TB_DEPARTMENT D
     JOIN TB_CLASS C ON D.DEPARTMENT_NO = C.DEPARTMENT_NO
     LEFT JOIN TB_GRADE G ON C.CLASS_NO = G.CLASS_NO
 WHERE
     D.DEPARTMENT_NAME = '환경조경학과'
-GROUP BY C.CLASS_NAME;
-
+    AND CLASS_TYPE LIKE '%전공%'
+GROUP BY C.CLASS_NO, C.CLASS_NAME
+ORDER BY 1;
 -- 17번
 -- 춘 기술대학교에 다니고 있는 최경희 학생과 같은 과 학생들의 이름과 주소를 출력하는 SQL 문을 작성하시오.
 SELECT 
@@ -247,6 +262,7 @@ FROM
             S.STUDENT_NAME 이름
             , S.STUDENT_NO 학번
             , SUM(G.POINT)
+            , AVG(G.POINT)
         FROM 
             TB_DEPARTMENT D
             JOIN TB_STUDENT S ON D.DEPARTMENT_NO = S.DEPARTMENT_NO
@@ -281,4 +297,6 @@ WHERE
                     WHERE
                         DEPARTMENT_NAME = '환경조경학과'
                 )
-GROUP BY D.DEPARTMENT_NAME;
+    AND CLASS_TYPE LIKE '%전공%'   
+GROUP BY D.DEPARTMENT_NAME
+ORDER BY 1;
